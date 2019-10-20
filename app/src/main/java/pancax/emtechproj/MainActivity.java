@@ -5,8 +5,14 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.LinearLayout;
 
 public class MainActivity extends AppCompatActivity implements OnTaskDoneListener {
+    LinearLayout navLayout;
+    LinearLayout walletLayout;
+    Button walletButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -17,10 +23,14 @@ public class MainActivity extends AppCompatActivity implements OnTaskDoneListene
         connect.execute("currencies");
         Intent intent = new Intent(this, web_activity.class);
         startActivity(intent);*/
-
+        initializeViews();
 
     }
-
+    private void initializeViews(){
+        navLayout = findViewById(R.id.nav_layout);
+        walletLayout = findViewById(R.id.wallet_layout);
+        walletButton = findViewById(R.id.wallet_button);
+    }
     @Override
     public void onTaskDone(String responseData) {
         //async task is done do wahtever
@@ -30,5 +40,8 @@ public class MainActivity extends AppCompatActivity implements OnTaskDoneListene
     @Override
     public void onError() {
 
+    }
+
+    public void walletButtonClicked(View v){
     }
 }
