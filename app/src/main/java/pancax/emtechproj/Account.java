@@ -12,7 +12,7 @@ public class Account {
         try {
             id=obj.get("id").toString();
             address=obj.get("address").toString();
-            wallet_provider_display_name=obj.get("wallet_provider_name").toString();
+            wallet_provider_name=obj.get("wallet_provider_name").toString();
             wallet_provider_display_name=obj.get("wallet_provider_display_name").toString();
         } catch (JSONException e) {
             e.printStackTrace();

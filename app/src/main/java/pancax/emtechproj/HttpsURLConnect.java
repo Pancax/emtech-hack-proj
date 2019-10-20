@@ -24,6 +24,7 @@ public class HttpsURLConnect extends AsyncTask<String, Void, String> {
     private URL url;
     private OnTaskDoneListener delegate;
     private Context c;
+    private String getWay;
 
     public HttpsURLConnect(Context c, String url, OnTaskDoneListener delegate){
         this.c=c;
@@ -51,7 +52,7 @@ public class HttpsURLConnect extends AsyncTask<String, Void, String> {
         String api_key = params[1];
         String secret_key = params[2];
         String client_id = params[3];
-
+        this.getWay=getway;
         String result="";
         HttpsURLConnection connection = null;
         try{
@@ -67,7 +68,10 @@ public class HttpsURLConnect extends AsyncTask<String, Void, String> {
             connection.addRequestProperty("X-Zabo-Sig",encodedString);
             connection.addRequestProperty("X-Zabo-Timestamp",currentTime);
             connection.connect();
+
             int responseCode = connection.getResponseCode();
+            if(!getWay.equals("/users"))
+            getWay+=" "+connection.getResponseMessage()+" "+ connection.getResponseCode();
             if (responseCode == HttpURLConnection.HTTP_OK) {
                 BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream()));
                 StringBuilder sb = new StringBuilder();
@@ -92,17 +96,7 @@ public class HttpsURLConnect extends AsyncTask<String, Void, String> {
     protected void onPostExecute(String result){
         super.onPostExecute(result);
         Okay=true;
-        delegate.onTaskDone(result);
-    }
-    public static String bytesToHex(byte[] bytes) {
-        char[] HEX_ARRAY = "0123456789abcdef".toCharArray();
-        char[] hexChars = new char[bytes.length * 2];
-        for (int j = 0; j < bytes.length; j++) {
-            int v = bytes[j] & 0xFF;
-            hexChars[j * 2] = HEX_ARRAY[v >>> 4];
-            hexChars[j * 2 + 1] = HEX_ARRAY[v & 0x0F];
-        }
-        return new String(hexChars);
+        delegate.onTaskDone(result,getWay);
     }
     private String calcHmacSha256(String key, String data) {
         byte[] hmacSha256 = null;
