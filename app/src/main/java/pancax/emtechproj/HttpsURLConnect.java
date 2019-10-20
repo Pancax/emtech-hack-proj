@@ -2,6 +2,7 @@ package pancax.emtechproj;
 
 import android.content.Context;
 import android.os.AsyncTask;
+import android.util.Log;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -9,6 +10,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.security.acl.LastOwnerException;
 import java.security.cert.Certificate;
 
 import javax.net.ssl.HttpsURLConnection;
@@ -49,8 +51,8 @@ public class HttpsURLConnect extends AsyncTask<String, Void, String> {
         String result="";
         HttpsURLConnection connection = null;
         try{
-            connection = (HttpsURLConnection) url.openConnection();
-
+            URL xc = new URL(url.toString()+bob);
+            connection = (HttpsURLConnection) xc.openConnection();
             connection.setRequestMethod(REQUEST_METHOD);
             connection.setReadTimeout(READ_TIMEOUT);
             connection.setConnectTimeout(CONNECTION_TIMEOUT);
@@ -58,7 +60,6 @@ public class HttpsURLConnect extends AsyncTask<String, Void, String> {
             connection.connect();
 
             int responseCode = connection.getResponseCode();
-
             if (responseCode == HttpURLConnection.HTTP_OK) {
                 BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream()));
                 StringBuilder sb = new StringBuilder();
@@ -67,10 +68,11 @@ public class HttpsURLConnect extends AsyncTask<String, Void, String> {
                     sb.append(line + "\n");
                 }
                 br.close();
-                result=sb.toString();
+                result+=sb.toString();
             }
         }catch(Exception e){
             e.printStackTrace();
+            Log.d("ERRORMESSAGE",e.getMessage());
         }finally{
             if(connection!=null)
                 connection.disconnect();
@@ -82,6 +84,6 @@ public class HttpsURLConnect extends AsyncTask<String, Void, String> {
     protected void onPostExecute(String result){
         super.onPostExecute(result);
         Okay=true;
-
+        delegate.onTaskDone(result);
     }
 }

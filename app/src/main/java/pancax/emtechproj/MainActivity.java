@@ -2,6 +2,7 @@ package pancax.emtechproj;
 
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 
 public class MainActivity extends AppCompatActivity implements OnTaskDoneListener {
 
@@ -18,6 +19,7 @@ public class MainActivity extends AppCompatActivity implements OnTaskDoneListene
     @Override
     public void onTaskDone(String responseData) {
         //async task is done do wahtever
+        Log.d("Response290","Response \n"+responseData);
     }
 
     @Override
