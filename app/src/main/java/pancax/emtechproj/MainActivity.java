@@ -18,6 +18,7 @@ public class MainActivity extends AppCompatActivity implements OnTaskDoneListene
         connect.execute("currencies");
         Intent intent = new Intent(this, web_activity.class);
         startActivity(intent);
+
     }
 
     @Override
