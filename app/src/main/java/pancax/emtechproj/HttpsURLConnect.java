@@ -1,10 +1,13 @@
 package pancax.emtechproj;
 
+import android.content.Context;
 import android.os.AsyncTask;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.cert.Certificate;
 
@@ -12,24 +15,38 @@ import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLPeerUnverifiedException;
 
 public class HttpsURLConnect extends AsyncTask<String, Void, String> {
-    public static final String REQUEST_METHOD = "GET";
-    public static final int READ_TIMEOUT = 15000;
-    public static final int CONNECTION_TIMEOUT = 15000;
+    private static final String REQUEST_METHOD = "GET";
+    private static final int READ_TIMEOUT = 15000;
+    private static final int CONNECTION_TIMEOUT = 15000;
     private boolean Okay;
-    URL url;
-    public HttpsURLConnect(URL url){
-        this.url=url;
+    private URL url;
+    private OnTaskDoneListener delegate;
+    private Context c;
+
+    public HttpsURLConnect(Context c, String url, OnTaskDoneListener delegate){
+        this.c=c;
+        this.delegate=delegate;
+        try {
+            this.url=new URL(url);
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
     }
-    public void setUrl(URL url){
-        if(Okay)
-            this.url=url;
+    public void setUrl(String url){
+        if(Okay) {
+            try {
+                this.url=new URL(url);
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            }
+        }
 
     }
     @Override
     protected String doInBackground(String... params) {
         Okay = false;
-        String result;
-        String inputLine;
+        String bob = params[0];
+        String result="";
         HttpsURLConnection connection = null;
         try{
             connection = (HttpsURLConnection) url.openConnection();
@@ -40,29 +57,24 @@ public class HttpsURLConnect extends AsyncTask<String, Void, String> {
 
             connection.connect();
 
-            InputStreamReader streamReader = new
-                    InputStreamReader(connection.getInputStream());
+            int responseCode = connection.getResponseCode();
 
-            BufferedReader reader = new BufferedReader(streamReader);
-            StringBuilder stringBuilder = new StringBuilder();
-
-            while((inputLine = reader.readLine()) != null){
-                stringBuilder.append(inputLine);
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                StringBuilder sb = new StringBuilder();
+                String line;
+                while ((line = br.readLine()) != null) {
+                    sb.append(line + "\n");
+                }
+                br.close();
+                result=sb.toString();
             }
-
-            reader.close();
-            streamReader.close();
-
-            result = stringBuilder.toString();
-
-            reader.close();
-            streamReader.close();
         }catch(Exception e){
             e.printStackTrace();
-            result="";
         }finally{
             if(connection!=null)
                 connection.disconnect();
+
         }
         return result;
     }
