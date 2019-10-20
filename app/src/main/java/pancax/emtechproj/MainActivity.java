@@ -1,6 +1,8 @@
 package pancax.emtechproj;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -14,6 +16,8 @@ public class MainActivity extends AppCompatActivity implements OnTaskDoneListene
 
         HttpsURLConnect connect = new HttpsURLConnect(this,urlString,this);
         connect.execute("currencies");
+        Intent intent = new Intent(this, web_activity.class);
+        startActivity(intent);
     }
 
     @Override
