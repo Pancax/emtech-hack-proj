@@ -24,6 +24,7 @@ public class MainActivity extends AppCompatActivity implements OnTaskDoneListene
     private final String API_KEY = "d0e625eb91e9e40f67bf1ae9636d42745be8f37d";
     private final String SECRET_KEY ="f9daeb948eedfc34f657e8cdbebc965635b856bf4977e813f30c90070a6339c4";
     private final String URL ="https://api.zabo.com/sandbox-v0";
+    private String currentUser="";
     private ArrayList<Account> accounts;
     AccountArrayAdapter listAdapter;
     @Override
@@ -54,15 +55,26 @@ public class MainActivity extends AppCompatActivity implements OnTaskDoneListene
         listView.setAdapter(listAdapter);
     }
     @Override
-    public void onTaskDone(String responseData) {
+    public void onTaskDone(String responseData,String getWay) {
         //async task is done do wahtever
-        Log.d("Response290","Response \n"+responseData);
-        readResponse(responseData);
+        Log.d("Response290","Response \n"+responseData+getWay);
+        if(getWay.equals("/users")) {
+            readUsersResponse(responseData);
+        }
+        else if(getWay.contains("/balances")){
+            readUserAccountResponse(responseData);
+        }
+        else if(getWay.contains("/users/"+currentUser+"/accounts")){
+            readUserAccountResponse(responseData);
+        }
+
     }
-    private void readResponse(String responseData){
+
+    private void readUsersResponse(String responseData){
         try {
             JSONObject bob = new JSONObject(responseData);
             JSONArray accountArr = (JSONArray) bob.getJSONArray("data").getJSONObject(0).getJSONArray("accounts");
+            currentUser = bob.getJSONArray("data").getJSONObject(0).getString("id");
             for(int i=0;i<accountArr.length();i++){
                 accounts.add(new Account(accountArr.getJSONObject(i)));
             }
@@ -70,6 +82,19 @@ public class MainActivity extends AppCompatActivity implements OnTaskDoneListene
             e.printStackTrace();
         }
         initializeListView();
+        updateAccountInfo();
+    }
+    private void readUserAccountResponse(String responseData){
+        Log.d("JSON RESPONSE",responseData);
+    }
+    private void updateAccountInfo(){
+        for(Account x: accounts){
+            HttpsURLConnect connect = new HttpsURLConnect(this,URL,this);
+            connect.execute("users/"+currentUser+"/accounts/"+x.getId(),API_KEY,SECRET_KEY,CLIENT_ID);
+            HttpsURLConnect otherconnect = new HttpsURLConnect(this,URL,this);
+            otherconnect.execute("users/"+currentUser+"/accounts/"+x.getId()+"/balances?currencies=eth,btc",API_KEY,SECRET_KEY,CLIENT_ID);
+
+        }
     }
     @Override
     public void onError() {
@@ -77,5 +102,6 @@ public class MainActivity extends AppCompatActivity implements OnTaskDoneListene
     }
 
     public void walletButtonClicked(View v){
+
     }
 }
