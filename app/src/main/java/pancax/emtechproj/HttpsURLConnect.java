@@ -47,29 +47,25 @@ public class HttpsURLConnect extends AsyncTask<String, Void, String> {
     @Override
     protected String doInBackground(String... params) {
         Okay = false;
-        String bob = params[0];
+        String getway = params[0];
+        String api_key = params[1];
+        String secret_key = params[2];
+        String client_id = params[3];
+
         String result="";
         HttpsURLConnection connection = null;
         try{
-            URL xc = new URL(url.toString()+bob);
-            connection = (HttpsURLConnection) xc.openConnection();
+            URL connectionUrl = new URL(url.toString()+getway);
+            connection = (HttpsURLConnection) connectionUrl.openConnection();
             connection.setRequestMethod(REQUEST_METHOD);
             connection.setReadTimeout(READ_TIMEOUT);
             connection.setConnectTimeout(CONNECTION_TIMEOUT);
             connection.setDoInput(true);
-
-            //add the request properties
-            //curl "https://api.zabo.com/sandbox-v0/exchange-rates" \
-            //  -H "X-Zabo-Key: adminApiKey-established-in-dash" \
-            //  -H "X-Zabo-Sig: signature-of-request-using-paired-secret-key" \
-            //  -H "X-Zabo-Timestamp: 1420069800000"
-            String b = System.currentTimeMillis()+"";
-            String s = calcHmacSha256("f9daeb948eedfc34f657e8cdbebc965635b856bf4977e813f30c90070a6339c4", b+xc.toString()+"");
-            connection.addRequestProperty("X-Zabo-Key","d0e625eb91e9e40f67bf1ae9636d42745be8f37d");
-            connection.addRequestProperty("X-Zabo-Sig",s);
-            connection.addRequestProperty("X-Zabo-Timestamp",b);
-            result+="Encode\n"+s+"\n"+b+"\n";
-
+            String currentTime= System.currentTimeMillis()+"";
+            String encodedString = calcHmacSha256(secret_key, currentTime+connectionUrl.toString()+"");
+            connection.addRequestProperty("X-Zabo-Key", api_key);
+            connection.addRequestProperty("X-Zabo-Sig",encodedString);
+            connection.addRequestProperty("X-Zabo-Timestamp",currentTime);
             connection.connect();
             int responseCode = connection.getResponseCode();
             if (responseCode == HttpURLConnection.HTTP_OK) {
@@ -82,8 +78,6 @@ public class HttpsURLConnect extends AsyncTask<String, Void, String> {
                 br.close();
                 result+=sb.toString();
             }
-            result+=connection.getResponseCode()+" "+connection.getResponseMessage();
-            result+=" "+b+xc.toString()+"\'\'";
         }catch(Exception e){
             e.printStackTrace();
             Log.d("ERRORMESSAGE",e.getMessage());
@@ -99,14 +93,6 @@ public class HttpsURLConnect extends AsyncTask<String, Void, String> {
         super.onPostExecute(result);
         Okay=true;
         delegate.onTaskDone(result);
-    }
-
-    private String encode(String key, String data) throws Exception {
-        Mac sha256_HMAC = Mac.getInstance("HmacSHA256");
-        SecretKeySpec secret_key = new SecretKeySpec(key.getBytes("UTF-8"), "HmacSHA256");
-        sha256_HMAC.init(secret_key);
-
-        return bytesToHex(sha256_HMAC.doFinal(data.getBytes("UTF-8")));
     }
     public static String bytesToHex(byte[] bytes) {
         char[] HEX_ARRAY = "0123456789abcdef".toCharArray();
