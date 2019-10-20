@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+  </head>
+  <body>
+  <p>Hello</p>
+  </body>
+  <script src="https://cdn.zabo.com/0.5.0/zabo.js"></script>
+  <script type="text/javascript">
+    zabo.init({
+    clientId: "J28kJ68mHfiXSYLqyoujgFA4mCrRGxBiUkELZS1YImTyD4DAhNmR9VZqpiFpqRUV",
+    env: "sandbox"
+  }).then(app => {
+    /* app is the application json object for the provided clientId */
+    console.log(app)
+
+    console.log('hello2');
+  }).catch(err => {
+    console.error(err)
+
+    console.log('hello3');
+  })
+
+
+  </script>
+</html>
