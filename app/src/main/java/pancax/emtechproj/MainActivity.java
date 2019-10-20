@@ -10,10 +10,10 @@ public class MainActivity extends AppCompatActivity implements OnTaskDoneListene
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        String urlString = "https://api.zabo.com/sandbox-v/";
+        String urlString = "https://api.zabo.com/sandbox-v0/";
 
         HttpsURLConnect connect = new HttpsURLConnect(this,urlString,this);
-        connect.execute("users");
+        connect.execute("currencies");
     }
 
     @Override
